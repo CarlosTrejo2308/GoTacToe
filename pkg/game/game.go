@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/carlostrejo2308/GoTakToe/pkg/board"
 	"github.com/carlostrejo2308/GoTakToe/pkg/piece"
@@ -91,6 +92,8 @@ func (g *Game) IaTurn() {
 // it is used as a default ia
 func iaRandom() (int, int) {
 	var x, y int
+
+	rand.Seed(time.Now().Unix())
 
 	x = rand.Intn(3)
 	y = rand.Intn(3)
