@@ -8,9 +8,13 @@ import (
 )
 
 func main() {
+	// Start a new game
 	g := game.NewGame()
+
+	// Play the game
 	g.Play()
 
+	// Print the winner
 	switch g.Winner {
 	case piece.Empty:
 		fmt.Println("It's a draw!")

@@ -6,8 +6,10 @@ import (
 	"github.com/carlostrejo2308/GoTakToe/pkg/piece"
 )
 
+// Board is a 3x3 board
 type Board [3][3]piece.Player
 
+// IsFull returns true if the board is full
 func (b *Board) IsFull() bool {
 	for _, row := range b {
 		for _, cell := range row {
@@ -20,6 +22,7 @@ func (b *Board) IsFull() bool {
 	return true
 }
 
+// IsWinner returns true if the player has won
 func (b *Board) IsWinning(player piece.Player) bool {
 	// Check rows
 	for _, row := range b {
@@ -46,6 +49,7 @@ func (b *Board) IsWinning(player piece.Player) bool {
 	return false
 }
 
+// Play places a piece in the board
 func (b *Board) Play(player piece.Player, x, y int) error {
 	if x < 0 || x > 2 || y < 0 || y > 2 {
 		return fmt.Errorf("invalid coordinates")
@@ -58,12 +62,13 @@ func (b *Board) Play(player piece.Player, x, y int) error {
 	return nil
 }
 
+// HumanTurn gets the coordinates of the player's move and plays it
 func (b *Board) HumanTurn() {
 	var x, y int
 	played := false
 
-	fmt.Print("Your turn (x, y): ")
 	for !played {
+		fmt.Print("Your turn (x, y): ")
 		fmt.Scanf("%d %d", &x, &y)
 
 		if err := b.Play(piece.Human, x, y); err != nil {

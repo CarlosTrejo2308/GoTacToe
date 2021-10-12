@@ -8,13 +8,16 @@ import (
 	"github.com/carlostrejo2308/GoTakToe/pkg/piece"
 )
 
+// Game represents a game of tick-tack-toe
 type Game struct {
 	board      *board.Board
 	Winner     piece.Player
 	iaMechanic func() (int, int)
 }
 
+// String returns a string representation of the game
 func (g Game) String() string {
+	// what a piece is represented by
 	represent := map[piece.Player]string{
 		piece.Empty: " ",
 		piece.Ia:    "X",
@@ -23,6 +26,7 @@ func (g Game) String() string {
 
 	toPrint := ""
 
+	// For each row, format the board
 	for i, row := range g.board {
 		toPrint += fmt.Sprintf("%s | %s | %s", represent[row[0]], represent[row[1]], represent[row[2]])
 		if i < 2 {
@@ -33,6 +37,7 @@ func (g Game) String() string {
 	return toPrint
 }
 
+// NewGame returns a new game
 func NewGame() *Game {
 	return &Game{
 		board:      &board.Board{},
@@ -41,10 +46,14 @@ func NewGame() *Game {
 	}
 }
 
+// isWinning checks if a player has won the game
 func (g *Game) isWinning(player piece.Player) bool {
+
+	// Check if the player has won in the board
 	b := g.board
 	w := b.IsWinning(player)
 
+	// If the player has won, set the winner
 	if w {
 		g.Winner = player
 	}
@@ -52,11 +61,13 @@ func (g *Game) isWinning(player piece.Player) bool {
 	return w
 }
 
+// StillPlaying returns true if the game has more turns to play
 func (g *Game) StillPlaying() bool {
 	b := g.board
 	return !b.IsFull() && g.Winner == piece.Empty
 }
 
+// IaTurn plays a turn for the ia
 func (g *Game) IaTurn() {
 
 	b := g.board
@@ -76,6 +87,8 @@ func (g *Game) IaTurn() {
 	}
 }
 
+// iaRandom returns a random position of the board,
+// it is used as a default ia
 func iaRandom() (int, int) {
 	var x, y int
 
@@ -85,18 +98,22 @@ func iaRandom() (int, int) {
 	return x, y
 }
 
+// Play calls the turn of both players and checks if someone has won
 func (g *Game) Play() {
 	b := g.board
 	fmt.Println(g)
 
+	// While the game is still playing
 	for g.StillPlaying() {
+		// Human turn
 		b.HumanTurn()
-		fmt.Println(g)
-		g.isWinning(piece.Human)
+		fmt.Println(g)           // Print the board
+		g.isWinning(piece.Human) // Check if the human has won
 		if !g.StillPlaying() {
 			break
 		}
 
+		// Ia turn
 		g.IaTurn()
 		fmt.Println(g)
 		g.isWinning(piece.Ia)
