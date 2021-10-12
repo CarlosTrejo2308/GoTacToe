@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
 type Player int
 
@@ -13,8 +16,9 @@ const (
 type Board [3][3]Player
 
 type Game struct {
-	board  *Board
-	winner Player
+	board      *Board
+	winner     Player
+	iaMechanic func() (int, int)
 }
 
 func (g Game) String() string {
@@ -38,8 +42,9 @@ func (g Game) String() string {
 
 func NewGame() *Game {
 	return &Game{
-		board:  &Board{},
-		winner: empty,
+		board:      &Board{},
+		winner:     empty,
+		iaMechanic: iaRandom,
 	}
 }
 
@@ -53,6 +58,17 @@ func (b *Board) isFull() bool {
 	}
 
 	return true
+}
+
+func (g *Game) isWinning(player Player) bool {
+	b := g.board
+	w := b.isWinning(player)
+
+	if w {
+		g.winner = player
+	}
+
+	return w
 }
 
 func (b *Board) isWinning(player Player) bool {
@@ -82,8 +98,11 @@ func (b *Board) isWinning(player Player) bool {
 }
 
 func (b *Board) play(player Player, x, y int) error {
+	if x < 0 || x > 2 || y < 0 || y > 2 {
+		return fmt.Errorf("invalid coordinates")
+	}
 	if b[x][y] != empty {
-		return fmt.Errorf("Cell (%d, %d) is already taken", x, y)
+		return fmt.Errorf("cell (%d, %d) is already taken", x, y)
 	}
 
 	b[x][y] = player
@@ -95,13 +114,78 @@ func (g *Game) StillPlaying() bool {
 	return !b.isFull() && g.winner == empty
 }
 
+func (b *Board) HumanTurn() {
+	var x, y int
+	played := false
+
+	fmt.Print("Your turn (x, y): ")
+	for !played {
+		fmt.Scanf("%d %d", &x, &y)
+
+		if err := b.play(human, x, y); err != nil {
+			fmt.Println(err)
+		} else {
+			played = true
+		}
+	}
+}
+
+func (g *Game) IaTurn() {
+
+	b := g.board
+	var x, y int
+	played := false
+
+	fmt.Println("I'm thinking...")
+	for !played {
+		x, y = g.iaMechanic()
+
+		if err := b.play(ia, x, y); err != nil {
+			continue
+		} else {
+			fmt.Printf("My turn: %d, %d\n", x, y)
+			played = true
+		}
+	}
+}
+
+func iaRandom() (int, int) {
+	var x, y int
+
+	x = rand.Intn(3)
+	y = rand.Intn(3)
+
+	return x, y
+}
+
+func (g *Game) Play() {
+	b := g.board
+	fmt.Println(g)
+
+	for g.StillPlaying() {
+		b.HumanTurn()
+		fmt.Println(g)
+		g.isWinning(human)
+		if !g.StillPlaying() {
+			break
+		}
+
+		g.IaTurn()
+		fmt.Println(g)
+		g.isWinning(ia)
+	}
+}
+
 func main() {
 	g := NewGame()
+	g.Play()
 
-	/* for b.StillPlaying() {
-		b.HumanTurn()
-		b.IATurn()
-	} */
-
-	fmt.Println(g)
+	switch g.winner {
+	case empty:
+		fmt.Println("It's a draw!")
+	case human:
+		fmt.Println("You win!")
+	case ia:
+		fmt.Println("I win!")
+	}
 }
