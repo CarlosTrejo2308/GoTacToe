@@ -98,6 +98,9 @@ func iaRandom() (int, int) {
 	x = rand.Intn(3)
 	y = rand.Intn(3)
 
+	wait := time.Duration(rand.Intn(700) + 100)
+	time.Sleep(wait * time.Millisecond)
+
 	return x, y
 }
 
