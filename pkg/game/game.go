@@ -113,6 +113,7 @@ func (g *Game) Play() {
 	for g.StillPlaying() {
 		// Human turn
 		b.HumanTurn()
+		fmt.Println()
 		fmt.Println(g)           // Print the board
 		g.isWinning(piece.Human) // Check if the human has won
 		if !g.StillPlaying() {
@@ -121,6 +122,7 @@ func (g *Game) Play() {
 
 		// Ia turn
 		g.IaTurn()
+		fmt.Println()
 		fmt.Println(g)
 		g.isWinning(piece.Ia)
 	}
