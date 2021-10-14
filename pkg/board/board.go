@@ -78,3 +78,7 @@ func (b *Board) HumanTurn() {
 		}
 	}
 }
+
+func (b *Board) IsValidMove(x, y int) bool {
+	return x >= 0 && x <= 2 && y >= 0 && y <= 2 && b[x][y] == piece.Empty
+}

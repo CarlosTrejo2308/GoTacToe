@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	"github.com/carlostrejo2308/GoTakToe/pkg/game"
+	"github.com/carlostrejo2308/GoTakToe/pkg/ia"
 	"github.com/carlostrejo2308/GoTakToe/pkg/piece"
 )
 
 func main() {
 	// Start a new game
 	g := game.NewGame()
+	g.SetIa(ia.Challenger)
 
 	// Play the game
 	g.Play()

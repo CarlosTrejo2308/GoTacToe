@@ -2,10 +2,9 @@ package game
 
 import (
 	"fmt"
-	"math/rand"
-	"time"
 
 	"github.com/carlostrejo2308/GoTakToe/pkg/board"
+	"github.com/carlostrejo2308/GoTakToe/pkg/ia"
 	"github.com/carlostrejo2308/GoTakToe/pkg/piece"
 )
 
@@ -13,7 +12,7 @@ import (
 type Game struct {
 	board      *board.Board
 	Winner     piece.Player
-	iaMechanic func() (int, int)
+	iaMechanic func(board.Board) (int, int)
 }
 
 // String returns a string representation of the game
@@ -43,7 +42,7 @@ func NewGame() *Game {
 	return &Game{
 		board:      &board.Board{},
 		Winner:     piece.Empty,
-		iaMechanic: iaRandom,
+		iaMechanic: ia.Random,
 	}
 }
 
@@ -68,6 +67,10 @@ func (g *Game) StillPlaying() bool {
 	return !b.IsFull() && g.Winner == piece.Empty
 }
 
+func (g *Game) SetIa(ia func(board.Board) (int, int)) {
+	g.iaMechanic = ia
+}
+
 // IaTurn plays a turn for the ia
 func (g *Game) IaTurn() {
 
@@ -77,7 +80,7 @@ func (g *Game) IaTurn() {
 
 	fmt.Println("I'm thinking...")
 	for !played {
-		x, y = g.iaMechanic()
+		x, y = g.iaMechanic(*b)
 
 		if err := b.Play(piece.Ia, x, y); err != nil {
 			continue
@@ -86,22 +89,6 @@ func (g *Game) IaTurn() {
 			played = true
 		}
 	}
-}
-
-// iaRandom returns a random position of the board,
-// it is used as a default ia
-func iaRandom() (int, int) {
-	var x, y int
-
-	rand.Seed(time.Now().Unix())
-
-	x = rand.Intn(3)
-	y = rand.Intn(3)
-
-	wait := time.Duration(rand.Intn(700) + 100)
-	time.Sleep(wait * time.Millisecond)
-
-	return x, y
 }
 
 // Play calls the turn of both players and checks if someone has won
