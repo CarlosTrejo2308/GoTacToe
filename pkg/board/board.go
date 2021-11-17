@@ -2,6 +2,8 @@ package board
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/carlostrejo2308/GoTakToe/pkg/piece"
 )
@@ -69,7 +71,8 @@ func (b *Board) HumanTurn() {
 
 	for !played {
 		fmt.Print("Your turn (x, y): ")
-		fmt.Scanf("%d %d", &x, &y)
+		x, y = Challenger(*b)
+		//fmt.Scanf("%d %d", &x, &y)
 
 		if err := b.Play(piece.Human, x, y); err != nil {
 			fmt.Println(err)
@@ -81,4 +84,64 @@ func (b *Board) HumanTurn() {
 
 func (b *Board) IsValidMove(x, y int) bool {
 	return x >= 0 && x <= 2 && y >= 0 && y <= 2 && b[x][y] == piece.Empty
+}
+
+func Random(b Board) (int, int) {
+	var x, y int
+
+	rand.Seed(time.Now().Unix())
+
+	x = rand.Intn(3)
+	y = rand.Intn(3)
+
+	wait := time.Duration(rand.Intn(700) + 100)
+	time.Sleep(wait * time.Millisecond)
+
+	return x, y
+}
+
+// Challenger is an IA that makes a move in the board
+// Considering if he has a winning move or
+// if the other player has a winning move, it blocks it
+// or makes a random move
+func Challenger(b Board) (int, int) {
+	var x, y int
+
+	ogBoard := b
+
+	// Check if there's a winning move
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			ogBoard.Play(piece.Human, i, j)
+			if win := ogBoard.IsWinning(piece.Human); win {
+				return i, j
+			}
+			ogBoard = b
+		}
+	}
+
+	// Check if there is a losing move
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			ogBoard.Play(piece.Ia, i, j)
+			if win := ogBoard.IsWinning(piece.Ia); win {
+				return i, j
+			}
+			ogBoard = b
+		}
+	}
+
+	// Choose a random position
+	valid := false
+	for !valid {
+		x, y = Random(b)
+		if err := b.Play(piece.Ia, x, y); err != nil {
+			continue
+		} else {
+			valid = true
+		}
+	}
+
+	return x, y
+
 }
